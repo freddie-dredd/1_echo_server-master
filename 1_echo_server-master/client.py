@@ -10,7 +10,7 @@ print("Введите порт (Введите пустую строку: 9090 -
 while not check:
     port = input(" --> ")
     if port:
-        if type(port) != int or int(port) <= 1023 or int(port) > 65535:
+        if int(port) <= 1023 or int(port) > 65535:
             print("Укажите верный номер порта")
         else:
             check = True
@@ -41,14 +41,17 @@ print(f"Соединение с сервером, {port}")
 
 while attempts_to_connect < 10:
     try:
-        sock.connect((host, port))
+        sock.connect((host, int(port)))
         print("Успешное подключение")
         attempts_to_connect = 10
         massage = ''
         while massage != "exit":
-            massage = input("Сообщение серверу --> ")
-            print(f"Отправка данных серверу, порт {port}")
-            sock.send(massage.encode())
+            try:
+                massage = input("Сообщение серверу --> ")
+                print(f"Отправка данных серверу, порт {port}")
+                sock.send(massage.encode())
+            except:
+                print("ConnectionResetError: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение")
 
         print(f"Приём данных от сервера, порт {port}")
         data = sock.recv(1024)
