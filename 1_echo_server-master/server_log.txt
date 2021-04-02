@@ -1,0 +1,6 @@
+Запуск севера
+Начало прослушивания порта 9090
+[datetime.datetime]Запуск севера
+[datetime.datetime]Начало прослушивания порта 9090
+[<class 'datetime.datetime'>]Запуск севера
+[<class 'datetime.datetime'>]Начало прослушивания порта 9090
