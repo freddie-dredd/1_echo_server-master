@@ -2,7 +2,15 @@ import socket, time, datetime
 
 sock = socket.socket()
 data_volume = 1024
-txtLogs = True
+txtLogs = False
+
+def print_info(string):
+	if txtLogs:
+		with open("server_log.txt", 'a') as logFile:
+			logFile.write(f"{datetime.datetime.now()}    " + string + '\n')
+	else:
+		print(string)
+
 
 def findPort():
 	port = 9090
@@ -13,12 +21,27 @@ def findPort():
 		print_info(f"Ошибка: порт {port} занят, поиск свободного порта")
 		sock.bind(('', 0))
 
-def print_info(string):
-	if txtLogs:
-		with open("server_log.txt", 'a') as logFile:
-			logFile.write(f"{datetime.datetime.now()}    " + string + '\n')
-	else:
-		print(string)
+
+def clientAuth(conn, addr):
+	print_info(f"Попытка аутентификации клиента {addr[0]}")
+	with open("clients.txt", 'r+') as clients:
+
+		findClient = False
+
+		for l in clients.readlines():
+			if addr[0] == l:
+				findClient = True
+
+				conn.send("AuthTrue".encode())
+				conn.send(f"Привет {addr[0]}".encode())
+				print_info(f"Клиент {addr[0]} найден")
+				return True
+
+		if findClient == False:
+			print_info(f"Запись клиента в whitelist {addr[0]}")
+			clients.write(f"\n{addr[0]}")
+
+
 
 
 def clientEcho():
@@ -30,6 +53,8 @@ def clientEcho():
 		sock.listen(1)
 
 		conn, addr = sock.accept()
+		clientAuth(conn, addr)
+
 		print_info(f"Подключение клиента {addr}")
 
 		while True:
@@ -46,8 +71,8 @@ def clientEcho():
 			conn.send(data.upper())
 			print_info(f"	От клиента принято сообщение: {data.decode()}")
 
-	except:
-		print_info(f"Клиент разорвал соединение")
+	except OSError:
+		print_info(f"Клиент {addr} разорвал соединение")
 		clientEcho()
 		time.sleep(1)
 

@@ -7,6 +7,7 @@ sock = socket.socket()
 
 check = False
 print("Введите порт (Введите пустую строку: 9090 - по умолчанию)")
+
 while not check:
     port = input(" --> ")
     if port:
@@ -35,31 +36,45 @@ while not check:
 
 
 
-
 print(f"Соединение с сервером, {port}")
 
-
 while attempts_to_connect < 10:
+
     try:
         sock.connect((host, int(port)))
+        print(sock.getsockname())
+
         print("Успешное подключение")
         attempts_to_connect = 10
-        massage = ''
-        while massage != "exit":
-            try:
-                massage = input("Сообщение серверу --> ")
-                print(f"Отправка данных серверу, порт {port}")
-                sock.send(massage.encode())
-            except:
-                print("ConnectionResetError: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение")
 
-        print(f"Приём данных от сервера, порт {port}")
-        data = sock.recv(1024)
+        try:
+            dataAuth = sock.recv(1024)
+        except:
+            print("Удаленный хост принудительно разорвал существующее подключение во время аутентификации")
+        print(dataAuth.decode())
 
-        print("Разрыв соединения с сервером")
-        sock.close()
+        if dataAuth.decode() == "AuthTrue":
+            print(dataAuth.decode())
 
-        print(data.decode())
+            massage = ''
+            while massage != "exit":
+                try:
+                    massage = input("Сообщение серверу --> ")
+                    print(f"Отправка данных серверу, порт {port}")
+                    sock.send(massage.encode())
+                except:
+                    print("ConnectionResetError: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение")
+
+            print(f"Приём данных от сервера, порт {port}")
+            data = sock.recv(1024)
+
+            print("Разрыв соединения с сервером")
+            sock.close()
+
+            print("     " + data.decode())
+
+        else:
+            print(f"Ошибка аунтентификации")
 
     except ConnectionRefusedError:
         print(f"Попытка соединения {attempts_to_connect}/10")
