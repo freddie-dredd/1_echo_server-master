@@ -77,12 +77,14 @@ def clientEcho():
 		time.sleep(1)
 
 
-print_info(f"Запуск севера")
 
-findPort()
-clientEcho()
+if __name__ == '__main__':
+	print_info(f"Запуск севера")
 
-print_info(f"Отключение сервера")
+	findPort()
+	clientEcho()
+
+	print_info(f"Отключение сервера")
 
 
 

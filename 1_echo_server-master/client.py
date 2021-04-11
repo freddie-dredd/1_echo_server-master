@@ -49,9 +49,10 @@ while attempts_to_connect < 10:
 
         try:
             dataAuth = sock.recv(1024)
+            print(dataAuth.decode())
         except:
             print("Удаленный хост принудительно разорвал существующее подключение во время аутентификации")
-        print(dataAuth.decode())
+
 
         if dataAuth.decode() == "AuthTrue":
             print(dataAuth.decode())
